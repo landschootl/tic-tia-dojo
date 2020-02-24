@@ -65,7 +65,7 @@ class Game {
 
     nextRound(cell) {
         const actualPlayer = this.getActualPlayer();
-        const cellPlay = cell || this.selectCell();
+        const cellPlay = cell || this.selectCell(actualPlayer);
         cellPlay.value = actualPlayer.symbol;
         this.board.draw(this.players);
         this.checkVictory(actualPlayer);
@@ -76,8 +76,14 @@ class Game {
         return cell.value === null;
     };
 
+    /** FUNCTION TO BE IMPLEMENTED */
     selectCell() {
-        /** TO IMPLEMENT */
+        /**** the parameters ****/
+        this.board.cells; // list of cell
+        this.players; // list of player
+        this.getActualPlayer(); // the current player
+
+        /**** return cell *******/
         const availableCells = this.board.cells.filter(cell => cell.value === null);
         return availableCells[Math.floor(Math.random() * Math.floor(availableCells.length))];
     };
@@ -107,6 +113,9 @@ class Game {
     };
 }
 
+/**
+ * Start-up function
+ */
 function main() {
     const game = new Game();
     const startGameBtn = document.getElementById('start-game-btn');
@@ -129,5 +138,4 @@ function main() {
         }
     }));
 }
-
 main();
