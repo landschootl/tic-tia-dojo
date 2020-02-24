@@ -36,9 +36,10 @@ function Game() {
     };
 
     this.selectCell = () => {
-        return this.board
-            .filter(cell => cell.value === null)
-            .find(cell => cell.value === null);
+        const availableCells = this.board
+            .filter(cell => cell.value === null);
+
+        return availableCells[Math.floor(Math.random() * Math.floor(availableCells.length))];
     };
 
     this.checkVictory = (actualPlayer) => {
