@@ -2,9 +2,11 @@
  * Class that represents a player
  */
 class Player {
-    constructor(name, symbol) {
+    constructor(name, symbol, color, isComputer) {
         this.name = name;
         this.symbol = symbol;
+        this.color = color;
+        this.isComputer = isComputer;
     }
 }
 
@@ -22,8 +24,15 @@ class Board {
         return this.cells.find(cell => cell.posX === posX && cell.posY === posY);
     }
 
-    draw() {
-        this.cells.forEach(cell => document.getElementById(`cell-${cell.posX}-${cell.posY}`).innerHTML = cell.value);
+    draw(players) {
+        this.cells.forEach(cell => {
+            const btn = document.getElementById(`cell-${cell.posX}-${cell.posY}`);
+            btn.innerHTML = cell.value;
+            if (cell.value !== null) {
+                btn.style.color = players.find(player => player.symbol === cell.value).color;
+            }
+
+        });
     }
 }
 
@@ -44,8 +53,8 @@ class Cell {
 class Game {
     round = 0;
     players = [
-        new Player('player 1', 'X'),
-        new Player('player 2', 'O')
+        new Player('player 1', 'X', '#ffcc5c', false),
+        new Player('player 2', 'O', '#ff6f69', true)
     ];
     board = new Board();
     isFinish = false;
@@ -58,7 +67,7 @@ class Game {
         const actualPlayer = this.getActualPlayer();
         const cellPlay = cell || this.selectCell();
         cellPlay.value = actualPlayer.symbol;
-        this.board.draw();
+        this.board.draw(this.players);
         this.checkVictory(actualPlayer);
         this.round++;
     };
@@ -86,14 +95,14 @@ class Game {
         ].forEach(winningCombination => {
             if (winningCombination.filter(cell => cell.value === actualPlayer.symbol).length === 3) {
                 this.isFinish = true;
-                winningCombination.forEach(cell => document.getElementById(`cell-${cell.posX}-${cell.posY}`).style.backgroundColor = '#5CB85C');
-                document.getElementById('result').innerHTML = `${actualPlayer.name} won`;
+                winningCombination.forEach(cell => document.getElementById(`cell-${cell.posX}-${cell.posY}`).style.backgroundColor = '#00D68F');
+                document.getElementById('result').innerHTML = `${actualPlayer.name} won !`;
             }
         });
 
         if (!this.isFinish && this.round === 8) {
             this.isFinish = true;
-            document.getElementById('result').innerHTML = `No winner`;
+            document.getElementById('result').innerHTML = `No winner..`;
         }
     };
 }
@@ -103,21 +112,22 @@ function main() {
     const startGameBtn = document.getElementById('start-game-btn');
 
     startGameBtn.addEventListener('click', () => {
-        startGameBtn.disabled = true;
+        startGameBtn.hidden = true;
         game.players = [game.players[1], game.players[0]];
         game.nextRound();
     });
 
     document.querySelectorAll("#board button").forEach(button => button.addEventListener('click', function () {
-        startGameBtn.disabled = true;
+        startGameBtn.hidden = true;
         const posCell = this.getAttribute('id').split('-');
-        const checkCell = game.board.getCell(parseInt(posCell[1]),parseInt(posCell[2]));
-        if (!game.isFinish && game.cellIsAvailable(checkCell)) {
+        const checkCell = game.board.getCell(parseInt(posCell[1]), parseInt(posCell[2]));
+        if (!game.isFinish && game.cellIsAvailable(checkCell) && !game.getActualPlayer().isComputer) {
             game.nextRound(checkCell);
             if (!game.isFinish) {
-                game.nextRound();
+                setTimeout(() => game.nextRound(), 500);
             }
         }
     }));
 }
+
 main();
