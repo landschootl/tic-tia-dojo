@@ -1,0 +1,23 @@
+{
+  "name": "tic-tac-dojo",
+  "version": "1.0.0",
+  "description": "Dojo Tic-Tac-toe IA ======================",
+  "main": "public/tic-tac-toe.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/landschootl/tic-tia-dojo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/landschootl/tic-tia-dojo/issues"
+  },
+  "homepage": "https://github.com/landschootl/tic-tia-dojo#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
