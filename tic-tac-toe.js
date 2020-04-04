@@ -76,7 +76,6 @@ class Game {
     nextRound(cell) {
         const actualPlayer = this.getActualPlayer();
         const cellPlay = cell || this.selectCell(actualPlayer);
-        console.log('cellPlay', cellPlay);
         cellPlay.value = actualPlayer.symbol;
         this.board.draw(this.players);
         this.checkVictory(actualPlayer);
@@ -124,35 +123,39 @@ class Game {
         // Regarde les combinaisons encore possible (une case de libre au minimum)
         const availableCombinations = combinations.filter(enemyCombination => ![3, -8, -19, -30].includes(enemyCombination.weight));
 
-        // Si il y a une possibilité de gagner avec 2 win et 1 libre
-        const winCombinationPonderous = availableCombinations.find(enemyCombination => enemyCombination.weight === 2);
-        if (winCombinationPonderous !== undefined) {
-            return winCombinationPonderous.winningCombination.find(cell => cell.value === null);
-        }
+        // Vérifie si il y a une combinaison avec le poid indiqué et si c'est le cas, retourne une case libre
+        const choiceSimpleCombinationAndCellByWeight = (availableCombinations, weight) => {
+            console.log('choiceSimpleCombinationAndCellByWeight', weight);
+            const combinations = availableCombinations.find(enemyCombination => enemyCombination.weight === weight);
+            if (combinations !== undefined) {
+                // if (combinations.length === 2) {
+                //     let cellsShare = combinations[0].filter(cell => combinations[1].includes(cell));
+                //     if (cellsShare.length > 0) {
+                //         return cellsShare[0];
+                //     }
+                // }
+                return combinations.winningCombination.find(cell => cell.value === null);
+            }
+        };
 
-        // Si il y a un risque 2 enemy et 1 libre
-        const enemyCombinations = availableCombinations.find(enemyCombination => enemyCombination.weight === -20);
-        if (enemyCombinations !== undefined) {
-            return enemyCombinations.winningCombination.find(cell => cell.value === null);
-        }
+        // Vérifie si il y a deux combinaisons avec le poid indiqué et si c'est le cas, retourne une case libre qui correspond au deux combinaisons si possible
+        // const choiceDoubleCombinationAndCellByWeight = (availableCombinations, weight) => {
+        //     console.log('choiceDoubleCombinationAndCellByWeight', weight);
+        //     const combinations = availableCombinations.find(enemyCombination => enemyCombination.weight === weight);
+        //     console.log('combinations length', combinations, combinations.length);
+        //     if (combinations !== undefined && combinations.length > 1) {
+        //         let cellsShare = combinations[0].filter(cell => combinations[1].includes(cell));
+        //         console.log('cellsShare length', cellsShare, cellsShare.length);
+        //         return cellsShare.length > 0 ? cellsShare[0] : combinations.winningCombination.find(cell => cell.value === null);
+        //     }
+        // };
 
-        // Si il y a deux cases libre et 1 case win
-        let nextCombination = availableCombinations.find(enemyCombination => enemyCombination.weight === 1);
-        if (nextCombination !== undefined) {
-            return nextCombination.winningCombination.find(cell => cell.value === null);
-        }
-
-        // Si il y a deux cases libre et 1 case win
-        nextCombination = availableCombinations.find(enemyCombination => enemyCombination.weight === -10);
-        if (nextCombination !== undefined) {
-            return nextCombination.winningCombination.find(cell => cell.value === null);
-        }
-
-        // sinon au hasard
-        if (this.round < 2) {
-            const availableCells = this.board.cells.filter(cell => cell.value === null);
-            return availableCells[Math.floor(Math.random() * Math.floor(availableCells.length))];
-        }
+        return choiceSimpleCombinationAndCellByWeight(availableCombinations, 2)       // Si il y a une possibilité de gagner avec 2 win et 1 libre
+            || choiceSimpleCombinationAndCellByWeight(availableCombinations, -20)     // Si il y a une possibilité de perdre avec 2 enemy et 1 libre
+            // || choiceDoubleCombinationAndCellByWeight(availableCombinations, -10)     // Si il y a deux possibilités de perdre avec 2 libres et 1 enemy
+            || choiceSimpleCombinationAndCellByWeight(availableCombinations, 1)       // Si il y a deux libres et 1 win
+            || choiceSimpleCombinationAndCellByWeight(availableCombinations, -10)     // Si il y a deux libres et 1 enemy
+            || choiceSimpleCombinationAndCellByWeight(availableCombinations, -9);     // Si il y a 1 enemy, 1 win et 1 libre
     };
 
     checkVictory(actualPlayer) {
